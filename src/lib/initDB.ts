@@ -5,6 +5,7 @@ import clogger from "@/utils/appLogger";
 
 interface TableSchema {
   name: string;
+  description: string;
   builder: (table: Knex.CreateTableBuilder) => void;
   initData?: (knex: Knex) => Promise<void>;
 }
@@ -14,6 +15,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     // 用户表
     {
       name: "o_user",
+      description: "用户表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("name");
@@ -28,6 +30,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //项目表
     {
       name: "o_project",
+      description: "项目表",
       builder: (table) => {
         table.integer("id");
         table.string("projectType");
@@ -50,6 +53,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //风格表
     {
       name: "o_artStyle",
+      description: "风格表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.string("name");
@@ -64,6 +68,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //Agent配置表
     {
       name: "o_agentDeploy",
+      description: "Agent配置表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.string("model");
@@ -265,6 +270,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //设置表
     {
       name: "o_setting",
+      description: "设置表",
       builder: (table) => {
         table.text("key");
         table.text("value");
@@ -319,6 +325,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //任务中心表
     {
       name: "o_tasks",
+      description: "任务中心表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("projectId");
@@ -337,6 +344,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //提示词表
     {
       name: "o_prompt",
+      description: "提示词表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.string("name");
@@ -374,6 +382,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //模型绑定提示词表
     {
       name: "o_modelPrompt",
+      description: "模型绑定提示词表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.string("vendorId");
@@ -388,6 +397,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //小说原文表
     {
       name: "o_novel",
+      description: "小说原文表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("chapterIndex");
@@ -406,6 +416,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //小说事件表
     {
       name: "o_event",
+      description: "小说事件表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.string("name");
@@ -418,6 +429,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //事件-章节表
     {
       name: "o_eventChapter",
+      description: "事件-章节表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("eventId").unsigned().references("id").inTable("o_event");
@@ -426,9 +438,10 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         table.unique(["id"]);
       },
     },
-    //剧本
+    //剧本表
     {
       name: "o_script",
+      description: "剧本表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("name");
@@ -444,6 +457,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //资产表
     {
       name: "o_assets",
+      description: "资产表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("name");
@@ -468,6 +482,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //生成图片表
     {
       name: "o_image",
+      description: "生成图片表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("filePath");
@@ -481,9 +496,10 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         table.unique(["id"]);
       },
     },
-    //分镜
+    //分镜表
     {
       name: "o_storyboard",
+      description: "分镜表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("scriptId");
@@ -504,9 +520,10 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         table.unique(["id"]);
       },
     },
-    //flowData-剧本
+    //flowData-剧本表
     {
       name: "o_agentWorkData",
+      description: "flowData-剧本表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("projectId");
@@ -519,9 +536,10 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         table.unique(["id"]);
       },
     },
-    //视频
+    //视频表
     {
       name: "o_video",
+      description: "视频表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("filePath");
@@ -535,9 +553,10 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         table.unique(["id"]);
       },
     },
-    // 视频轨道
+    // 视频轨道表
     {
       name: "o_videoTrack",
+      description: "视频轨道表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.integer("videoId");
@@ -555,6 +574,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //供应商配置表
     {
       name: "o_vendorConfig",
+      description: "供应商配置表",
       builder: (table) => {
         table.string("id").notNullable();
         table.text("inputValues"); // 输入项值 JSON
@@ -619,6 +639,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //图片工作流表
     {
       name: "o_imageFlow",
+      description: "图片工作流表",
       builder: (table) => {
         table.integer("id").notNullable();
         table.text("flowData").notNullable();
@@ -628,6 +649,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     },
     {
       name: "o_assets2Storyboard",
+      description: "资产故事板表",
       builder: (table) => {
         table.integer("storyboardId").notNullable();
         table.integer("assetId").notNullable();
@@ -637,6 +659,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     },
     {
       name: "o_scriptAssets",
+      description: "脚本资产表",
       builder: (table) => {
         table.integer("scriptId").notNullable();
         table.integer("assetId").notNullable();
@@ -646,6 +669,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     },
     {
       name: "o_skillList",
+      description: "技能列表表",
       builder: (table) => {
         table.text("id").notNullable();
         table.text("md5").notNullable();
@@ -939,6 +963,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     },
     {
       name: "o_skillAttribution",
+      description: "技能属性表",
       builder: (table) => {
         table.text("skillId").notNullable().references("id").inTable("o_skillList").onDelete("CASCADE");
         table.text("attribution").notNullable(); // "production_agent_decision.md" | "production_agent_execution.md" | "production_agent_supervision.md" | "script_agent_decision.md" | "script_agent_execution.md" | "script_agent_supervision.md" | "universal_agent.md"
@@ -1009,6 +1034,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     //记忆表（message=原始消息, summary=压缩摘要）
     {
       name: "memories",
+      description: "记忆表",
       builder: (table) => {
         table.text("id").notNullable();
         table.text("isolationKey").notNullable(); // 记忆隔离键
@@ -1027,6 +1053,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
     },
     {
       name: "o_assetsRole2Audio",
+      description: "assetsRole2Audio",
       builder: (table) => {
         table.integer("assetsRoleId").notNullable();
         table.integer("assetsAudioId").notNullable();
@@ -1043,7 +1070,7 @@ export default async (knex: Knex, forceInit: boolean = false): Promise<void> => 
         await knex.schema.dropTable(t.name);
         clogger.info("[初始化数据库] 已存在表删除并重建:", t.name);
       } else {
-        clogger.info("[初始化数据库] 创建数据表:", t.name);
+        clogger.info("[初始化数据库] 创建数据表:", t.name, "(", t.description, ")");
       }
       await knex.schema.createTable(t.name, t.builder);
       if (t.initData) {
