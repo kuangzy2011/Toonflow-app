@@ -18,6 +18,7 @@ import { isEletron } from "@/utils/getPath";
 import { ensureThumbnail, ThumbnailSize } from "@/utils/image";
 import clogger from "@/utils/appLogger";
 import {getNetworkAddrs, getExternalIPv4} from "./utils/networks";
+import { responseHook } from "@/middleware/middleware";
 
 const app = express();
 const server = http.createServer(app);
@@ -172,11 +173,18 @@ export default async function startServe(randomPort: Boolean = false) {
     clogger.warn("静态网站目录不存在:", webDir);
   }
 
+  // 全局中间件，hook所有入站请求
   app.use(async (req, res, next) => {
-    clogger.debug("请求路径:", req.path, ", 请求方法:", req.method, ", 请求体:", req.body);
+    const { path, method, body, ip } = req;
+
+    clogger.debug("[HOOK Request] url:", path, ", 请求方法:", method, ", 请求体:", body);
 
     const setting = await u.db("o_setting").where("key", "tokenKey").select("value").first();
-    if (!setting) return res.status(444).send({ message: "服务器秘钥未配置，请联系管理员" });
+    if (!setting){
+      clogger.error("服务器秘钥未配置，请联系管理员!");
+      return res.status(444).send({ message: "服务器秘钥未配置，请联系管理员" });
+    }
+
     const { value: tokenKey } = setting;
     // 从 header 或 query 参数获取 token
     const rawToken = req.headers.authorization || (req.query.token as string) || "";
@@ -184,21 +192,34 @@ export default async function startServe(randomPort: Boolean = false) {
     // 白名单路径
     if (req.path === "/api/login/login") return next();
 
-    if (!token) return res.status(401).send({ message: "未提供token" });
+    if (!token){
+      clogger.error("未提供token");
+      return res.status(401).send({ message: "未提供token" });
+    }
+
+    //clogger.debug("Token: ", token);
+
     try {
       const decoded = jwt.verify(token, tokenKey as string);
       (req as any).user = decoded;
       next();
     } catch (err) {
+      clogger.error("无效的token");
       return res.status(401).send({ message: "无效的token" });
     }
   });
+  //app.use(requestEnhancer);
+
+  // 注册全局 Response 中间件
+  app.use(responseHook);
+
 
   const router = await import("@/router");
   await router.default(app);
 
   // 404 处理
   app.use((_, res, next: NextFunction) => {
+    clogger.error("API 404 Not Found");
     return res.status(404).send({ message: "API 404 Not Found" });
   });
 
@@ -207,6 +228,7 @@ export default async function startServe(randomPort: Boolean = false) {
     res.locals.message = err.message;
     res.locals.error = err;
     console.error(err);
+    clogger.error(err.message);
     res.status(err.status || 500).send(err);
   });
 

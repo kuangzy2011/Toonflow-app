@@ -3,6 +3,8 @@ import u from "@/utils";
 import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
+import clogger from "@/utils/appLogger";
+
 const router = express.Router();
 
 export default router.post(
@@ -11,9 +13,11 @@ export default router.post(
     type: z.enum(["text", "image", "video", "all"]),
   }),
   async (req, res) => {
+    clogger.debug("Running route: /routes/modelSelect/getModelList");
     const { type } = req.body;
     const dataList = await u.db("o_vendorConfig").select("id").where("enable", 1);
     if (!dataList || dataList.length === 0) {
+      clogger.error("模型未找到");
       return res.status(404).send({ error: "模型未找到" });
     }
     const modelList = await Promise.all(dataList.map((i) => u.vendor.getModelList(i.id!)));
@@ -37,3 +41,4 @@ export default router.post(
     res.status(200).send(success(result.flat()));
   },
 );
+
