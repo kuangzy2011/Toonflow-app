@@ -3,6 +3,7 @@ import u from "@/utils";
 import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
+import clogger from "@/utils/appLogger";
 
 const router = express.Router();
 
@@ -16,12 +17,15 @@ export default router.post(
   }),
   async (req, res) => {
     const { projectId, novelIds, concurrentCount = 5 } = req.body;
+    clogger.debug("[novel/event/generateEvents], body:", req.body);
+
 
     const [allChapters, novel] = await Promise.all([
       u.db("o_novel").where("projectId", projectId).whereIn("id", novelIds),
       Promise.resolve(new u.cleanNovel(concurrentCount)),
     ]);
     if (allChapters.length === 0) {
+      clogger.error("没有对应章节");
       return res.status(400).send(success("没有对应章节"));
     }
     await u.db("o_novel").where("projectId", projectId).whereIn("id", novelIds).update({ eventState: 0, event: null });

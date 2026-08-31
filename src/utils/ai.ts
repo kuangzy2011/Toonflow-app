@@ -3,6 +3,7 @@ import { devToolsMiddleware } from "@ai-sdk/devtools";
 import axios from "axios";
 import { transform } from "sucrase";
 import u from "@/utils";
+import clogger from "@/utils/appLogger";
 
 type AiType =
   | "scriptAgent"
@@ -44,6 +45,7 @@ const AiTypeValues: AiType[] = [
   "universalAi",
 ];
 async function resolveModelName(value: AiType | `${string}:${string}`): Promise<`${string}:${string}`> {
+  clogger.debug("Call resolveModelName---------value:", value);
   if (AiTypeValues.includes(value as AiType)) {
     const agentUseModeVal = await u.db("o_setting").where("key", "agentUseMode").first();
 
@@ -79,6 +81,7 @@ async function resolveModelName(value: AiType | `${string}:${string}`): Promise<
 }
 
 async function getModelConfig(value: AiType | `${string}:${string}`) {
+  clogger.debug("Call getModelConfig---------value:", value);
   if (AiTypeValues.includes(value as AiType)) {
     const agentUseModeVal = await u.db("o_setting").where("key", "agentUseMode").first();
     //正常流程
@@ -116,6 +119,7 @@ async function getVendorTemplateFn(
 ): Promise<(think?: boolean, thinkLevel?: 0 | 1 | 2 | 3) => any>;
 async function getVendorTemplateFn(fnName: Exclude<FnName, "textRequest">, modelName: `${string}:${string}`): Promise<(input: any) => any>;
 async function getVendorTemplateFn(fnName: FnName, modelName: `${string}:${string}`): Promise<any> {
+  clogger.debug("Call getVendorTemplateFn---------fnName:", fnName, ", modelName:", modelName);
   const [id, name] = modelName.split(/:(.+)/);
   const vendorConfigData = await u.db("o_vendorConfig").where("id", id).first();
   if (!vendorConfigData) throw new Error(`未找到供应商配置 id=${id}`);
@@ -150,6 +154,9 @@ async function withTaskRecord<T>(
   const modelName = await resolveModelName(modelKey);
   const [_, model] = modelName.split(/:(.+)/);
   const taskRecord = await u.task(projectId, taskClass, model, { describe: describe, content: relatedObjects });
+
+  clogger.debug("Call withTaskRecord---------modelKey:", modelKey, ", modelName:", modelName);
+
   try {
     const result = await fn(modelName, false, 0);
 
@@ -196,25 +203,34 @@ class AiText {
   }
   async invoke(input: Omit<Parameters<typeof generateText>[0], "model">) {
     const config = await getModelConfig(this.AiType);
+    clogger.debug("Call AiText invoke---------config:", config);
 
-    return generateText({
+    let respTxt = generateText({
       ...(input.tools && { stopWhen: stepCountIs(Object.keys(input.tools).length * 50) }),
       ...input,
       model: await this.resolveModel(),
       ...(config?.temperature && { temperature: config.temperature }),
       ...(config?.maxOutputTokens && { maxOutputTokens: config.maxOutputTokens }),
     } as Parameters<typeof generateText>[0]);
+    clogger.debug("Call AiText invoke---------respTxt:", respTxt);
+
+    return respTxt;
   }
   async stream(input: Omit<Parameters<typeof streamText>[0], "model">) {
     const config = await getModelConfig(this.AiType);
+    clogger.debug("Call AiText stream---------config:", config);
 
-    return streamText({
+    let respTxt = streamText({
       ...(input.tools && { stopWhen: stepCountIs(Object.keys(input.tools).length * 50) }),
       ...input,
       model: await this.resolveModel(extractReasoningMiddleware({ tagName: "reasoning_content", separator: "\n" })),
       ...(config?.temperature && { temperature: config.temperature }),
       ...(config?.maxOutputTokens && { maxOutputTokens: config.maxOutputTokens }),
     } as Parameters<typeof streamText>[0]);
+
+    clogger.debug("Call AiText stream---------respTxt:", respTxt);
+
+    return respTxt;
   }
 }
 
