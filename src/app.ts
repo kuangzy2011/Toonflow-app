@@ -6,7 +6,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
 import http from "node:http";
 import expressWs from "express-ws";
-import logger from "morgan";
+import morgan from "morgan";
 import cors from "cors";
 import buildRoute from "@/core";
 import path from "path";
@@ -78,7 +78,11 @@ export default async function startServe(randomPort: Boolean = false) {
 
   expressWs(app);
 
-  app.use(logger("dev"));
+  //app.use(morgan("dev"));
+  // 自定义 skip 函数：如果状态码 < 400，则跳过（不打印）
+  app.use(morgan('dev', {
+    skip: (req, res) => res.statusCode < 400
+  }));  
   app.use(cors({ origin: "*" }));
   app.use(express.json({ limit: "100mb" }));
   app.use(express.urlencoded({ extended: true, limit: "100mb" }));
@@ -177,7 +181,9 @@ export default async function startServe(randomPort: Boolean = false) {
   app.use(async (req, res, next) => {
     const { path, method, body, ip } = req;
 
-    clogger.debug("[HOOK Request] url:", path, ", 请求方法:", method, ", 请求体:", body);
+    if(path != "/api/setting/about/checkUpdate") {
+      clogger.debug("[HOOK Request] url:", path, ", 请求方法:", method, ", 请求体:", body);
+    }
 
     const setting = await u.db("o_setting").where("key", "tokenKey").select("value").first();
     if (!setting){
