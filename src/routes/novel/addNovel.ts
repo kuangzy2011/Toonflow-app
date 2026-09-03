@@ -22,6 +22,7 @@ export default router.post(
   }),
   async (req, res) => {
     const { projectId, data } = req.body;
+    clogger.debug("/routes/novel/addNovel: projectId:", projectId);
     const totalNovelId = [];
     const getLastChapterIndex = await u.db("o_novel").where("projectId", projectId).select("chapterIndex").orderBy("chapterIndex", "desc").first();
     let lastChapterIndex = 0;
@@ -29,7 +30,6 @@ export default router.post(
       lastChapterIndex = getLastChapterIndex.chapterIndex!;
     }
     for (const item of data) {
-      clogger.debug("/routes/novel/addNovel: data:", data);
       const [id] = await u.db("o_novel").insert({
         projectId,
         chapterIndex: ++lastChapterIndex,
