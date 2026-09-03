@@ -6,6 +6,7 @@ import path from "path";
 import { validateFields } from "@/middleware/middleware";
 import { z } from "zod";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 编辑导演手册
 export default router.post(
@@ -30,6 +31,7 @@ export default router.post(
         images: string[];
         data: { label: string; value: string; data: string }[];
       };
+      clogger.debug("/routes/project/editDirectorManual: name:", name);
 
       // 安全校验：不允许包含路径分隔符、纯数字，防止越级删除或误删项目目录
       if (name.includes("/") || name.includes("\\") || name === "." || name === ".." || /^\d+$/.test(name)) {

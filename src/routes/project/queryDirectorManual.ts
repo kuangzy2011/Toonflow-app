@@ -4,6 +4,7 @@ import { success } from "@/lib/responseFormat";
 import fs from "fs";
 import path from "path";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 字段映射表
 const DATA_MAP: { label: string; value: string; subDir?: string }[] = [
@@ -41,6 +42,7 @@ async function readAllImages(imagesDir: string) {
 export default router.post("/", async (req, res) => {
   try {
     const artPromptsDir = u.getPath(["skills", "story_skills"]);
+    clogger.debug("/routes/project/queryDirectorManual: artPromptsDir:", artPromptsDir);
 
     // 读取所有风格文件夹
     const styleDirs = fs

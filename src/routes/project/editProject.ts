@@ -4,6 +4,7 @@ import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 新增项目
 export default router.post(
@@ -24,6 +25,7 @@ export default router.post(
   }),
   async (req, res) => {
     const { id, name, intro, type, artStyle, videoRatio, directorManual, imageModel, videoModel, imageQuality, projectType, mode } = req.body;
+    clogger.debug("/routes/project/editProject: name:", name);
 
     await u.db("o_project").where("id", id).update({
       name,

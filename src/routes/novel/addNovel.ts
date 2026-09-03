@@ -4,6 +4,7 @@ import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 新增原文数据
 export default router.post(
@@ -28,6 +29,7 @@ export default router.post(
       lastChapterIndex = getLastChapterIndex.chapterIndex!;
     }
     for (const item of data) {
+      clogger.debug("/routes/novel/addNovel: data:", data);
       const [id] = await u.db("o_novel").insert({
         projectId,
         chapterIndex: ++lastChapterIndex,

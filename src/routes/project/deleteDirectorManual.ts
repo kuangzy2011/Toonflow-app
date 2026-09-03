@@ -5,6 +5,7 @@ import { z } from "zod";
 import { error, success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 删除导演手册
 export default router.post(
@@ -15,6 +16,7 @@ export default router.post(
   async (req, res) => {
     try {
       const { name } = req.body as { name: string };
+      clogger.debug("/routes/project/deleteDirectorManual: name:", name);
 
       // 安全校验：不允许包含路径分隔符、纯数字，防止越级删除或误删项目目录
       if (name.includes("/") || name.includes("\\") || name === "." || name === ".." || /^\d+$/.test(name)) {

@@ -4,6 +4,7 @@ import u from "@/utils";
 import { z } from "zod";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 export default router.post(
   "/",
@@ -12,6 +13,7 @@ export default router.post(
   }),
   async (req, res) => {
     const { key } = req.body;
+    clogger.debug("/routes/project/getModelDetails: key:", key);
     const data = await u.db("o_agentDeploy").select("o_agentDeploy.*").where("o_agentDeploy.key", key).first();
     const [id, modelName] = data ? data.modelName.split(/:(.+)/) : [];
     const models = await u.vendor.getModelList(id);
