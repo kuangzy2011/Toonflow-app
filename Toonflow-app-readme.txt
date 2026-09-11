@@ -43,7 +43,7 @@ yarn dist:win
 ]]
 
 //////////////////////////////////
-[Uninstall ollama]
+[Uninstall ollama] - 10.70.128.16
 #1 停止&关闭开机自启
 sudo systemctl stop ollama
 sudo systemctl disable ollama
