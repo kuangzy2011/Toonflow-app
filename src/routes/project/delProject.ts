@@ -4,6 +4,7 @@ import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 删除项目
 export default router.post(
@@ -13,6 +14,8 @@ export default router.post(
   }),
   async (req, res) => {
     const { id } = req.body;
+    clogger.debug("/routes/project/delProject: id:", id);
+
     //删除项目
     await u.db("o_project").where("id", id).delete();
     await u.db("o_agentWorkData").where("projectId", id).delete();

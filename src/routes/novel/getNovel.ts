@@ -4,6 +4,7 @@ import { z } from "zod";
 import { success } from "@/lib/responseFormat";
 import { validateFields } from "@/middleware/middleware";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 获取原文数据
 export default router.post(
@@ -29,6 +30,8 @@ export default router.post(
       .orderBy("chapterIndex", "asc")
       .limit(limit)
       .offset(offset);
+
+    clogger.debug("/routes/novel/getNovel: data:", data);
 
     // 统计总数
     const totalQuery = (await u

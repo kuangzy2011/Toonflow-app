@@ -16,9 +16,9 @@ import jwt from "jsonwebtoken";
 import socketInit from "@/socket/index";
 import { isEletron } from "@/utils/getPath";
 import { ensureThumbnail, ThumbnailSize } from "@/utils/image";
-import clogger from "@/utils/appLogger";
 import {getNetworkAddrs, getExternalIPv4} from "./utils/networks";
 import { responseHook } from "@/middleware/middleware";
+import clogger from "@/utils/appLogger";
 
 const app = express();
 const server = http.createServer(app);

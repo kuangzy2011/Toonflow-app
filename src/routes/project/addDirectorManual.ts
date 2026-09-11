@@ -6,6 +6,7 @@ import path from "path";
 import { validateFields } from "@/middleware/middleware";
 import { z } from "zod";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 新增导演手册
 export default router.post(
@@ -30,6 +31,7 @@ export default router.post(
         data: { label: string; value: string; data: string }[];
         directorManual: string;
       };
+      clogger.debug("/routes/project/addDirectorManual: name:", name);
       // 安全校验：不允许包含路径分隔符、纯数字，防止越级删除或误删项目目录
       if (name.includes("/") || name.includes("\\") || name === "." || name === ".." || /^\d+$/.test(name)) {
         res.status(400).send(error("名称不能包含路径分隔符或为纯数字"));

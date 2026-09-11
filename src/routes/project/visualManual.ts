@@ -7,6 +7,7 @@ import getPath from "@/utils/getPath";
 import fs from "fs";
 import path from "path";
 const router = express.Router();
+import clogger from "@/utils/appLogger";
 
 // 视觉手册
 export default router.post(
@@ -16,6 +17,7 @@ export default router.post(
   }),
   async (req, res) => {
     const { type } = req.body;
+    clogger.debug("/routes/project/visualManual: type:", type);
     const basePath = getPath(["skills", "art_skills", "chinese_sweet_romance"]);
     // 递归查找 basePath 下名为 `${type}.md` 的文件
     const findFile = (dir: string, target: string): string | null => {
